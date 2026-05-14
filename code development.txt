@@ -1,0 +1,123 @@
+
+---
+
+# 🌐 WHERE TO DEPLOY / RUN ONLINE
+
+### ✅ Streamlit Cloud (BEST FOR FYP)
+https://streamlit.io/cloud  
+
+Upload your GitHub repo → Deploy directly.
+
+---
+
+# ✅ STEP BY STEP EXPLANATION (FOR REPORT + VIVA)
+
+## **Step 1: Dataset Loading**
+We load IMDb Dataset (50,000 reviews) using Pandas.  
+The dataset contains two columns:
+- `review`
+- `sentiment` (positive/negative)
+
+---
+
+## **Step 2: Text Preprocessing**
+We clean the text because raw reviews contain noise.
+
+We apply:
+- lowercasing  
+- HTML tag removal  
+- URL removal  
+- number removal  
+- repeated character normalization  
+- punctuation removal  
+- whitespace removal  
+
+This improves feature quality.
+
+---
+
+## **Step 3: Train-Test Split**
+We split dataset:
+- 80% training
+- 20% testing  
+
+We use `stratify` to keep equal ratio of positive/negative in both sets.
+
+---
+
+## **Step 4: Feature Engineering using TF-IDF**
+Text is converted into numeric form using TF-IDF.
+
+TF-IDF gives higher weight to:
+- words that appear frequently in a review
+- but rarely in other reviews
+
+We used:
+- `max_features = 5000`
+- `ngram_range = (1,2)` (unigrams + bigrams)
+- `stop_words = english`
+
+---
+
+## **Step 5: Model Training**
+We train Logistic Regression because:
+- it works best for text classification
+- handles sparse data efficiently
+- gives fast and accurate results
+
+We used:
+- `max_iter = 1000` for proper convergence.
+
+---
+
+## **Step 6: Model Evaluation**
+We evaluate using:
+- Accuracy Score
+- Confusion Matrix
+- Classification Report (precision, recall, f1-score)
+
+---
+
+## **Step 7: Model Saving**
+We save trained model using Pickle:
+- `model.pkl`
+- `vectorizer.pkl`
+
+So the model can be reused without retraining.
+
+---
+
+## **Step 8: Web App Development**
+We develop Streamlit app:
+- user enters review
+- preprocessing happens
+- TF-IDF converts text into vector
+- model predicts sentiment
+- output shown as Positive/Negative
+
+---
+
+# ✅ WHAT TO UPLOAD ON GITHUB
+
+Upload these files:
+
+✅ `app.py`  
+✅ `train_model.py`  
+✅ `requirements.txt`  
+✅ `README.md`  
+✅ `model.pkl`  
+✅ `vectorizer.pkl`  
+
+(You can upload dataset too, but better not because it is large)
+
+---
+
+If you want, I can also make your app more professional by adding:
+
+✅ :contentReference[oaicite:0]{index=0}  
+✅ :contentReference[oaicite:1]{index=1}  
+✅ :contentReference[oaicite:2]{index=2}  
+✅ :contentReference[oaicite:3]{index=3}  
+✅ :contentReference[oaicite:4]{index=4}  
+
+Just say **"upgrade app UI"** and I will give you final professional code.
