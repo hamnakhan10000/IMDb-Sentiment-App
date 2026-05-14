@@ -1,0 +1,118 @@
+import pandas as pd
+import numpy as np
+import re
+import string
+import pickle
+
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+
+
+# -------------------------------
+# TEXT CLEANING FUNCTION
+# -------------------------------
+def clean_text(text):
+    text = str(text).lower()
+
+    # Remove HTML tags
+    text = re.sub(r"<br\s*/?>", " ", text)
+
+    # Remove URLs
+    text = re.sub(r"http?://\S+|www\.\S+", " ", text)
+
+    # Remove numbers
+    text = re.sub(r"\d+", " ", text)
+
+    # Remove repeated characters (soooo -> soo)
+    text = re.sub(r"(.)\1{2,}", r"\1\1", text)
+
+    # Remove punctuation
+    text = text.translate(str.maketrans("", "", string.punctuation))
+
+    # Remove extra spaces
+    text = re.sub(r"\s+", " ", text).strip()
+
+    return text
+
+
+# -------------------------------
+# LOAD DATASET
+# -------------------------------
+print("Loading Dataset...")
+df = pd.read_csv("IMDb Dataset.csv")
+
+print("Dataset Loaded Successfully")
+print("Total Reviews:", len(df))
+
+# Clean text
+print("Cleaning Reviews...")
+df["cleaned_review"] = df["review"].apply(clean_text)
+
+# -------------------------------
+# TRAIN TEST SPLIT
+# -------------------------------
+X_train, X_test, y_train, y_test = train_test_split(
+    df["cleaned_review"],
+    df["sentiment"],
+    test_size=0.2,
+    random_state=42,
+    stratify=df["sentiment"]
+)
+
+print("Training Samples:", len(X_train))
+print("Testing Samples:", len(X_test))
+
+# -------------------------------
+# TF-IDF FEATURE ENGINEERING
+# -------------------------------
+print("Applying TF-IDF Vectorization...")
+vectorizer = TfidfVectorizer(
+    max_features=5000,
+    ngram_range=(1, 2),
+    stop_words="english"
+)
+
+X_train_vec = vectorizer.fit_transform(X_train)
+X_test_vec = vectorizer.transform(X_test)
+
+print("Vectorization Completed")
+print("Feature Shape:", X_train_vec.shape)
+
+# -------------------------------
+# MODEL TRAINING
+# -------------------------------
+print("Training Logistic Regression Model...")
+model = LogisticRegression(max_iter=1000)
+model.fit(X_train_vec, y_train)
+
+print("Model Training Completed")
+
+# -------------------------------
+# MODEL EVALUATION
+# -------------------------------
+y_pred = model.predict(X_test_vec)
+
+accuracy = accuracy_score(y_test, y_pred)
+print("\nMODEL ACCURACY:", accuracy)
+
+print("\nCLASSIFICATION REPORT:\n")
+print(classification_report(y_test, y_pred))
+
+print("\nCONFUSION MATRIX:\n")
+print(confusion_matrix(y_test, y_pred))
+
+# -------------------------------
+# SAVE MODEL + VECTORIZER
+# -------------------------------
+print("\nSaving Model and Vectorizer...")
+
+with open("model.pkl", "wb") as f:
+    pickle.dump(model, f)
+
+with open("vectorizer.pkl", "wb") as f:
+    pickle.dump(vectorizer, f)
+
+print("Files Saved Successfully!")
+print("model.pkl and vectorizer.pkl created.")

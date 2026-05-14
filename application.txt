@@ -1,0 +1,66 @@
+import streamlit as st
+import pickle
+import re
+import string
+
+
+# -------------------------------
+# TEXT CLEANING FUNCTION
+# -------------------------------
+def clean_text(text):
+    text = str(text).lower()
+
+    text = re.sub(r"<br\s*/?>", " ", text)
+    text = re.sub(r"http?://\S+|www\.\S+", " ", text)
+    text = re.sub(r"\d+", " ", text)
+    text = re.sub(r"(.)\1{2,}", r"\1\1", text)
+
+    text = text.translate(str.maketrans("", "", string.punctuation))
+    text = re.sub(r"\s+", " ", text).strip()
+
+    return text
+
+
+# -------------------------------
+# LOAD MODEL + VECTORIZER
+# -------------------------------
+@st.cache_resource
+def load_model():
+    with open("model.pkl", "rb") as f:
+        model = pickle.load(f)
+
+    with open("vectorizer.pkl", "rb") as f:
+        vectorizer = pickle.load(f)
+
+    return model, vectorizer
+
+
+model, vectorizer = load_model()
+
+# -------------------------------
+# APP UI DESIGN
+# -------------------------------
+st.set_page_config(page_title="IMDb Sentiment Analyzer", layout="centered")
+
+st.title("🎬 IMDb Movie Review Sentiment Analyzer")
+st.write("This application predicts whether a movie review is **Positive** or **Negative**.")
+
+st.markdown("---")
+
+review = st.text_area("✍️ Enter Movie Review Here:", height=200)
+
+if st.button("Predict Sentiment"):
+    if review.strip() == "":
+        st.warning("⚠️ Please enter a review first.")
+    else:
+        cleaned = clean_text(review)
+        vec = vectorizer.transform([cleaned])
+        prediction = model.predict(vec)[0]
+
+        if prediction == "positive":
+            st.success("✅ Prediction: POSITIVE Review 😊")
+        else:
+            st.error("❌ Prediction: NEGATIVE Review 😠")
+
+st.markdown("---")
+st.caption("Developed for Final Year Project (FYP) - Sentiment Analysis using Logistic Regression + TF-IDF")
